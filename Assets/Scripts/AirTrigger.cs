@@ -3,9 +3,6 @@ using System.Collections;
 
 public class AirTrigger : MonoBehaviour {
 
-    //NOTE: Debating if this should end up being used
-    //Might get changed out with a Lerp
-
     public GameObject ball;
     public RoomControlGUI roomControlGUI;
 

@@ -3,12 +3,9 @@ using System.Collections;
 
 public class RoomControlGUI : MonoBehaviour {
 
-    //NOTE: ALL COMMENTED OUT STUFF RELATES TO BALL BOB, MAY OR MAY NOT ACTUALLY BE INCLUDED IN THE END
-
     //is the room full of air?
     public bool fillRoom = false;
     public bool start = false;
-    //public bool ballBob = false;
 
     //data about the room animation
     public float vSpeed = .1f;
@@ -33,6 +30,8 @@ public class RoomControlGUI : MonoBehaviour {
 
     public float labelwidth = 100;
 
+    public bool moveBall = false;
+
 
     void Start()
     {
@@ -54,7 +53,8 @@ public class RoomControlGUI : MonoBehaviour {
             GUI.color = Color.Lerp(GUI.color, new Color(0, 0, 0, 1), fadeSpeed);
             //Draw all the things!
 
-            hSliderValue = GUI.HorizontalSlider(new Rect(GraphX, GraphY, width, height), hSliderValue, 0.0F, 100.0F);
+            if(graphScript.fillDone)
+                hSliderValue = GUI.HorizontalSlider(new Rect(GraphX, GraphY, width, height), hSliderValue, 0.0F, 100.0F);
 
             // make the first button. If pressed, do the function
             if (GUI.Button(new Rect(20, 40, 90, 20), "RESET"))
@@ -70,12 +70,6 @@ public class RoomControlGUI : MonoBehaviour {
 
             GUI.color = Color.red;
             GUI.Label(new Rect(541.5f+167, 541.5f, 167, 100), "Red: Ball Density");
-
-            /*if (GUI.Button(new Rect(20, 200, 80, 20), "FullSpeed"))
-                FullSpeed();
-
-            if (GUI.Button(new Rect(20, 230, 80, 20), "HalfSpeed"))
-                HalfSpeed();*/
         }
         else
             GUI.color = new Color(1, 1, 1, 0);
@@ -89,48 +83,32 @@ public class RoomControlGUI : MonoBehaviour {
         
         if (start)
         {
-            if (fillRoom)
+            if (moveBall)
             {
                 curBallY = Mathf.Lerp(curBallY, endPoint, vSpeed);
                 ball.transform.position = new Vector3(ball.transform.position.x, curBallY, ball.transform.position.z);
             }
             curBallY = ball.transform.position.y;
 
-            foreach (SpriteRenderer i in walls)
-                i.color = Color.Lerp(i.color, newColor, gradSpeed * Time.deltaTime);
+            if (!graphScript.changeGraph || graphScript.fillDone)
+            {
+                foreach (SpriteRenderer i in walls)
+                    i.color = Color.Lerp(i.color, newColor, gradSpeed * Time.deltaTime);
+            }
         }
         else
             ResetBallTransform();
-
-        // partially done ball bobbing thing
-        /*if (ball.rigidbody.isKinematic)
-        {
-            //ball.transform.Translate(Vector3.up * Mathf.Lerp(0, 1);
-        }*/
     }
-
-    /*void FullSpeed()
-    {
-        vSpeed = 50;
-        gradSpeed = 1.5f;
-        waitTime = 1.5f;
-        bobSpeed = 1f;
-    }
-
-    void HalfSpeed()
-    {
-        vSpeed = 25;
-        gradSpeed = .75f;
-        waitTime = .75f;
-        bobSpeed = .5f;
-    }*/
 
     // Empty the room
     void EmptyRoom()
     {
+        moveBall = false;
+        graphScript.fadeDelay = 0f;
+        graphScript.changeGraph = true;
+        graphScript.fadeOut = true;
         fillRoom = false;
         newColor = Color.white;
-        //ballBob = false;
         ball.rigidbody.isKinematic = false;
         ball.rigidbody.velocity = Vector3.zero;
         ball.rigidbody.useGravity = true;
